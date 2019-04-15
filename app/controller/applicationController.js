@@ -22,15 +22,17 @@ exports.resources = (req, res) => {
                     res.json({
                         'pilot': result.pilot,
                         'date': result.date,
-                        'lengthRoute': lengthRoute,
+                        'lengthRoute': lengthRoute.toFixed(2),
                         'startHeight': startHeight,
                         'endHeight': endHeight,
                         'startTime': startTime,
                         'startEnd': endTime,
-                        'speed': speed,
+                        'speed': speed.toFixed(2),
                         "routeTime": routeTime,
                         "task": result.task === null ? "nie" : "tak",
+                        "statusCode":200,
                         "coordinates": coordinates
+
                     });
                 }catch (e) {
                     res.json({
@@ -38,19 +40,20 @@ exports.resources = (req, res) => {
                         'statusCode' : 422
                     });
                 }
+            }else{
+                res.json({
+                    'messageError': "Bad url",
+                    'statusCode' : 400
+                });
             }
-        }).on('finish', function() {
-            res.json({
-                'messageError': "Bad url",
-                'statusCode' : 404
-            });
-        });
-};
+        })
+    };
 
 setResult = (result) => {
     let eT = 0;
     let sT = 0;
     coordinates = [];
+    lengthRoute = 0;
     result.fixes.map((x, index) => {
 
         if ((index === 0)) {
@@ -109,6 +112,7 @@ getLengthRoute = (lat1, lon1, lat2, lon2) => {
 };
 
 getSpeed = (time, route) => {
+    speed = 0;
     time = (time.split(":")[0] * 3600 + +time.split(":")[1] * 60 + +time.split(":")[2]);
     speed = ((route * 1000) / time) * 3.6;
 }
