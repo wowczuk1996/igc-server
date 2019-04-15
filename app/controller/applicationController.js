@@ -39,6 +39,11 @@ exports.resources = (req, res) => {
                     });
                 }
             }
+        }).on('finish', function() {
+            res.json({
+                'messageError': "Bad url",
+                'statusCode' : 404
+            });
         });
 };
 
