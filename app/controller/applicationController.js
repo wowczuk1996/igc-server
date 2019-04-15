@@ -50,7 +50,7 @@ setResult = (result) => {
             endTime = x.time ;
             endHeight =x.gpsAltitude;
         }
-        coordinates.push(new GPS(x.latitude, x.longitude, x.time));
+        coordinates.push(new GPS(x.latitude, x.longitude));
 
         //Route
         if (index + 1 < result.fixes.length) {
@@ -65,7 +65,7 @@ setResult = (result) => {
     getSpeed(routeTime, lengthRoute);
 };
 
-function msToTime(s)  {
+ msToTime = (s) => {
     let ms = s % 1000;
     s = (s - ms) / 1000;
     let secs = s % 60;
@@ -76,11 +76,11 @@ function msToTime(s)  {
     return hrs + ':' + mins + ':' + secs;
 }
 
-function degreesToRadians(degrees) {
+degreesToRadians = (degrees) => {
     return degrees * Math.PI / 180;
 }
 
-function getLengthRoute(lat1, lon1, lat2, lon2) {
+getLengthRoute = (lat1, lon1, lat2, lon2) => {
     let earthRadiusKm = 6371;
 
     let dLat = degreesToRadians(lat2 - lat1);
@@ -94,9 +94,9 @@ function getLengthRoute(lat1, lon1, lat2, lon2) {
     let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     lengthRoute += earthRadiusKm * c;
     return earthRadiusKm * c;
-}
+};
 
-function getSpeed (time, route){
+ getSpeed = (time, route) =>{
     time = (time.split(":")[0] * 3600 + +time.split(":")[1] * 60 + +time.split(":")[2]);
     speed = ((route * 1000) / time) * 3.6;
 }
