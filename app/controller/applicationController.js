@@ -13,32 +13,39 @@ let result = '';
 let coordinates = [];
 
 exports.resources = (req, res) => {
-    request.get(req.body.url, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-            result = IGCParser.parse(body);
-        }
-        setResult(result);
 
-        res.json({
-            'pilot': result.pilot,
-            'date': result.date,
-            'lengthRoute': lengthRoute,
-            'startHeight': startHeight,
-            'endHeight': endHeight,
-            'startTime': startTime,
-            'startEnd': endTime,
-            'speed': speed,
-            "routeTime": routeTime,
-            "task": result.task === null ? "nie" : "tak",
-            "coordinates": coordinates
+        request.get(req.body.url, (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                try {
+                result = IGCParser.parse(body)
+                setResult(result);
+                    res.json({
+                        'pilot': result.pilot,
+                        'date': result.date,
+                        'lengthRoute': lengthRoute,
+                        'startHeight': startHeight,
+                        'endHeight': endHeight,
+                        'startTime': startTime,
+                        'startEnd': endTime,
+                        'speed': speed,
+                        "routeTime": routeTime,
+                        "task": result.task === null ? "nie" : "tak",
+                        "coordinates": coordinates
+                    });
+                }catch (e) {
+                    res.json({
+                        'messageError': "Cen not read file",
+                        'statusCode' : 422
+                    });
+                }
+            }
         });
-    });
 };
 
 setResult = (result) => {
     let eT = 0;
     let sT = 0;
-
+    coordinates = [];
     result.fixes.map((x, index) => {
 
         if ((index === 0)) {
@@ -47,8 +54,8 @@ setResult = (result) => {
             startHeight = x.gpsAltitude;
         } else if ((index === (result.fixes.length - 1))) {
             eT = x.timestamp;
-            endTime = x.time ;
-            endHeight =x.gpsAltitude;
+            endTime = x.time;
+            endHeight = x.gpsAltitude;
         }
         coordinates.push(new GPS(x.latitude, x.longitude));
 
@@ -65,7 +72,7 @@ setResult = (result) => {
     getSpeed(routeTime, lengthRoute);
 };
 
- msToTime = (s) => {
+msToTime = (s) => {
     let ms = s % 1000;
     s = (s - ms) / 1000;
     let secs = s % 60;
@@ -96,7 +103,7 @@ getLengthRoute = (lat1, lon1, lat2, lon2) => {
     return earthRadiusKm * c;
 };
 
- getSpeed = (time, route) =>{
+getSpeed = (time, route) => {
     time = (time.split(":")[0] * 3600 + +time.split(":")[1] * 60 + +time.split(":")[2]);
     speed = ((route * 1000) / time) * 3.6;
 }
